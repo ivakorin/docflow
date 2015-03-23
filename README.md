@@ -1,7 +1,7 @@
 # contracts-base
 This is contracts database based in MySQL and PHP
- NOTE! This project now not have admin panel, therefore you necessary use phpmyadmin or another soft for change/delete/input some data
- Now this portal not have admin panel, maybe it will added to next realises, but i think that administrator panel no needed, because all issues can be solved through users permissions.
+ - NOTE! This project now not have admin panel, therefore you necessary use phpmyadmin or another soft for change/delete/input some data
+ - Now this portal not have admin panel, maybe it will added to next realises, but i think that administrator panel no needed, because all issues can be solved through users permissions.
 
 ## How to install
  - First of all download last revision of Codeigniter 3 (http://www.codeigniter.com/);
