@@ -1,8 +1,9 @@
 # Contracts-base
 
-  This is contracts database based in MySQL and PHP
-  NOTE! This project now no have admin panel, therefore you necessary use phpmyadmin or another tools for change/delete/input some data
-  Maybe adminpanel will added to next realises, but i think no necessary add this tool, because all issues can be solved through users permissions.
+  This contracts portal based on MySQL and PHP, portal can help small companies organize contract docflow. This project based on Russian law (223 Federal act), but also can used commercial companies with some small changes.
+
+  NOTE! Now this project no have admin panel, therefore you necessary use phpmyadmin or another tools for change/delete/input some data it will solved in next realises.
+  Also perhaps adminpanel will added to next realises, but i think this tool no necessary, because all issues can be solved through users permissions.
 
 ## How to install
 
