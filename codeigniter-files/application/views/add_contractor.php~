@@ -1,0 +1,54 @@
+	<div id="content">
+	   <p class="header"><? echo $title;?></p>
+		<div class="main_filed">
+		<? echo form_open('Contracts/contractor_added', 'class=add_contractor');
+		   $contractor_type = array(
+		                      'suppliers' => 'Поставщик',
+		                      'customers' => 'Заказчик',
+		   );
+		   echo form_dropdown('contractor_type', $contractor_type);
+		?>
+		<br>
+		<p>Форма собственности:
+		<?
+		   echo form_input('pattern_of_ownership', '', 'maxlength="3" size="3"' );
+		?>
+		</p><br>
+		<p>Наименование:
+		<?
+		   echo form_input ('name');
+		?>
+		</p><br>
+		<p>Почтовый индекс:
+		<?
+		   echo form_input('postcode','','maxlength = "6" size = "6"');
+		?>
+		</p><br>
+		<p>Область:
+		<?
+		   echo form_textarea('area','', 'rows="2" cols="40"');
+		?>
+		</p><br>
+		<p>Район:
+		<?
+		   echo form_textarea('region','','', 'rows="2" cols="40"');
+		?>
+		</p><br>
+		<p>Город:
+		<?
+		   echo form_input('city','');
+		?>
+		<p>Улица:
+		<?
+		   echo form_input('street','');
+		?>
+		</p><br>
+		<p>Дом:
+		<?
+		   echo form_input('building','');
+		?>
+		</p><br>
+		<?
+		   echo form_submit('send', 'Добавить');
+		?>
+		</div>
