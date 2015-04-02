@@ -23,6 +23,13 @@
  */
 
 class Users extends CI_Controller {
+    private function jurist ($data){
+        $result = $this->contracts_model->jurist($data);
+            foreach ($result as $value){
+                $result = $value['jurist'];
+            }
+        return $result;
+    }
     private function user($data){
         $this->load->model('contracts_model');
         $email = $data;
@@ -111,6 +118,7 @@ class Users extends CI_Controller {
         $this->load->library('session');
         $check_auth = $this->session->userdata('logged_in');
         if ($check_auth == true) {
+            $this->load->helper('form', 'url');
             $email = $this->session->userdata('email');
             $this->load->model('users_model');
             $this->load->model('contracts_model');
@@ -118,6 +126,14 @@ class Users extends CI_Controller {
             foreach ($user as $value){
                 $title['user'] = $value['initials'];
             }
+            $separator = '-';
+            $title['purchase_methods'] = $this->contracts_model->purchase_methods();
+            $title['purchase_types'] = $this->contracts_model->purchase_types();
+            $title['valute_list'] = $this->contracts_model->get_valutes();
+            $title['species'] = $this->contracts_model->get_species();
+            $title['letters_list'] = $this->contracts_model->get_letters();
+            $title['date'] = date('d.m.Y');
+            $title['contract_number'] = 1+$this->contracts_model->get_contract_number().$separator.date('y');
             $data = ['curator' => $email];
             $title['all_contracts'] = $this->users_model->get_contract_number($data);
             $title['curator_count'] = count($title['all_contracts']);
@@ -126,8 +142,15 @@ class Users extends CI_Controller {
             $title['initiator_count'] = count($title['initiator']);
             $title['for_agree'] = $this->users_model->get_agree_contract ($title['user']);
             $title['for_agree_count'] = count($title['for_agree']);
+            $title['jurist_new_contracts'] = $this->contracts_model->jurist_new_contracts();
+            $title['jurist_new_contracts_count'] = count($title['jurist_new_contracts']);
+            $title['jurist_contracts'] = $this->contracts_model->jurist_contracts($this->session->userdata('email'));
+            $title['jurist_contracts_count'] = count($title['jurist_contracts']);
+            $title['jurist'] = $this->jurist($this->session->userdata('email'));
             $title['journal']= $value['initials'];
             $title['main']='Личный кабинет';
+            $title['curator']=$email;
+            $title['add_contract'] = 'Добавить договор';
             $this->load->view('head', $title);
             $this->load->view('cabinet');
             $this->load->view('footer');

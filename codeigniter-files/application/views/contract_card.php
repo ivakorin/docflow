@@ -4,6 +4,11 @@
                 foreach ($files_list0 as $fv){
                     $files_list[$fv['file_name']]=$fv['file_name'];
                 }
+                $letters = ['none' => 'Выберете литеру'];
+                foreach ($letters_list as $value){
+                    $letters[$value['letter']] = $value['letter'];
+                }
+                unset ($value);
             ?>
                 <div class="row">
                     <div class="col-md-12">
@@ -14,9 +19,51 @@
                         </div>
                     </div>
                 </div>
+                <?
+                if ($jt == '1' && $letter_type == 'N/A' ){
+                    echo '
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h1 class="text-danger"><strong>Внимание!</strong> Необходимо установить литеру договора</h1>
+                        </div>
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#add_letter">Добавить литеру</button>
+                        </div>
+                        <div class="modal fade" tabindex="-1" id="add_letter"role="dialog" aria-hidden="true">
+                          <div class="modal-dialog modal-sm">
+                            <div class="modal-content">
+                                <div class="modal-body">';
+                                echo form_open ('','class="form-inline" id="letter_form"');
+                                echo    '<div class="form-group">
+                                            <label for="letter">Литера</label>';
+                                            echo form_dropdown ('letter', $letters, '','id="letter" class="form-control"');
+                                echo    '</div>';
+                                echo form_hidden ('contract_number', $contract_number);
+                                echo form_hidden ('jurist', $user_email);
+                                echo form_close();
+                                echo '</div>
+                              <div class="modal-footer">
+                                <button type="close" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                                <button type="submit" id="add_letters_btn" form="letter_form" class="btn btn-primary">Добавить</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                    </div>';
+                }
+                ?>
                 <div class="row">
                     <div class="col-md-5">
-                        <p class="lead">Договор №: <?echo $contract_number.'/'.$letter_type;?><small class="text-muted">/<? echo $incoming_contract_number;?></small></p>
+                        <p class="lead">Договор №: <?echo $contract_number.'/'.$letter_type;?><small class="text-muted">/<? echo $incoming_contract_number;?></small>
+                        <?
+                        if (time() > $validity && $status == 'signed'){
+                            echo '<em class="text-danger">(Не действующий)</em>';
+                        }
+                        else if (time() > $validity && $status == 'signed'){
+                            echo '<em class="text-success">(Действующий)</em>';
+                        }
+                        ?>
+                        </p>
                         <p>Куратор:
                             <?  echo '<a href="mailto:'.$email.'">';
                                 echo $initials;
@@ -30,12 +77,25 @@
                         <p class="lead">Статус:
                             <?  if ($status == 'agreed'){
                                     echo '<em class="text-success" >Согласован</em>';
+                                    if ($jt == '1'){
+                                        echo '<div class="form-inline"><div class="form-group">';
+                                        echo form_open ('Contracts/contract_signed','id="signed-form"');
+                                        echo form_hidden('status','signed');
+                                        echo form_hidden('contract_number', $contract_number);
+                                        echo form_hidden ('curator_email', $email);
+                                        echo '<button id="signed-btn" class="btn btn-primary">Договор подписан</button>';
+                                        echo form_close();
+                                        echo '</div></div>';
+                                    }
                                 }
                                 else if ($status == 'inprocess'){
                                     echo '<em class="text-warning" >На согласовании</em>';
                                 }
                                 else if ($status == 'disagree'){
                                     echo '<em class="text-danger" >Не согласован</em>';
+                                }
+                                else if ($status == 'signed'){
+                                    echo '<em class="text-primary" >Подписан</em>';
                                 }
                                 else{
                                     echo '<em class="text-info" >Проект</em>';
@@ -73,7 +133,7 @@
                                     ?></dd>
                                 <dt>Тип договора</dt>
                                 <dd><p><?echo $contract_type;?></p></dd>
-                                <dt>Вид закупки</dt>
+                                <dt>Способ закупки</dt>
                                 <dd><p><?echo $purchase_method;?></p></dd>
                             </dl>
                         </div>
@@ -103,7 +163,9 @@
                                             echo '<p class="col-md-8" >'.$row['file_name'].'</p>';
                                             echo '<p class="col-md-3">'.date('d.m.Y', $create_date).'</p>';
                                             echo '</a>';
+                                            if ($jt == '1'){
                                             echo '<button type="submit" class="delete-contract-card" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+                                            }
                                         }
                                         echo '</div>
                                             </div>
@@ -147,7 +209,9 @@
                                             echo '<p class="col-md-8" >'.$row['file_name'].'</p>';
                                             echo '<p class="col-md-3">'.date('d.m.Y', $create_date).'</p>';
                                             echo '</a>';
+                                            if ($jt == '1'){
                                             echo '<button type="submit" class="delete-contract-card" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+                                            }
                                         }
                                         echo '</div>
                                             </div>
@@ -191,7 +255,9 @@
                                             echo '<p class="col-md-8" >'.$row['file_name'].'</p>';
                                             echo '<p class="col-md-3">'.date('d.m.Y', $create_date).'</p>';
                                             echo '</a>';
+                                            if ($jt == '1'){
                                             echo '<button type="submit" class="delete-contract-card" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+                                            }
                                         }
                                         echo '</div>
                                             </div>
@@ -235,7 +301,9 @@
                                             echo '<p class="col-md-8" >'.$row['file_name'].'</p>';
                                             echo '<p class="col-md-3">'.date('d.m.Y', $create_date).'</p>';
                                             echo '</a>';
+                                            if ($jt == '1'){
                                             echo '<button type="submit" class="delete-contract-card" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+                                            }
                                         }
                                         echo '</div>
                                             </div>
@@ -263,11 +331,14 @@
                         </div>
                         <div class="col-md-12" id="show-add-div">
                             <?
-                            if ($user_email === $email){
+                            if ($jt == '1' && $letter_type !='N/A'){
                                 echo '<button class="btn btn-primary" id="show-add-form" type="button">Добавить файл</button>';
                             }
-                            else{
+                            else if ($jt != '1'){
 
+                            }
+                            else{
+                                echo '<p class="text-danger">Чтобы добавлять файлы необходимо установить литеру договора</p>';
                             }
                             ?>
                         </div>
@@ -316,11 +387,14 @@
                                         echo' <span class="text-primary" title="Прерван">Согласование прервано</span></a></p>';
                                     }
                             }
-                            if ($user_email === $email){
+                            if ($jt == '1' && $letter_type !='N/A'){
                                 echo '<button class="btn btn-success" type="button" data-toggle="modal" data-target="#beginAgree">Начать согласование</button>';
                             }
-                            else{
+                            else if ($jt != '1'){
 
+                            }
+                            else{
+                                echo '<p class="text-danger">Для начала согласования необходимо установить литеру договора</p>';
                             }
                             ?>
                         </div>

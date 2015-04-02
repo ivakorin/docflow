@@ -71,6 +71,13 @@ class Contracts_model extends CI_Model{
     function add_contract($data){
         $this->db->set($data)->insert('contracts_journal');
     }
+// Ищем юристов среди пользователей
+    function find_jurist (){
+        $this->db->where('jurist !=', '0');
+        $this->db->select ('email');
+        $query = $this->db->get('users');
+        return $query -> result_array();
+    }
 
 /*ДОБАВЛЕНИЕ КОНТРАГЕНТА*/
 
@@ -98,6 +105,12 @@ class Contracts_model extends CI_Model{
         $this->db->where('contract_number', $data);
         $query = $this->db->get('contracts_journal');
         return $query -> result_array();
+    }
+    function jurist ($data){
+        $this->db->where('email', $data);
+        $this->db->select ('jurist');
+        $query = $this->db->get('users');
+        return $query->result_array();
     }
     function get_curator($data){
         $this->db->where('email', $data);
@@ -134,6 +147,13 @@ class Contracts_model extends CI_Model{
     function delete_file($data){
         $query = $this->db->delete('links_to_files', $data);
         return $query;
+    }
+// ДОБАВЛЕНИЕ ЛИТЕРЫ ДОГОВОРА
+    function add_letter ($number, $data){
+        $this->db->where('contract_number', $number);
+        $query = $this->db->update('contracts_journal', $data);
+        return $query;
+
     }
 /*ЖУРНАЛ ДОГОВОРОВ*/
     function get_all_contracts(){
@@ -210,7 +230,12 @@ class Contracts_model extends CI_Model{
 //AJAX запрос на прерывание согласования договора
     function break_agree($data){
         $this->db->where($data);
-        $status = ['status'=>'interrupted', 'global_status' => 'interrupted'];
+        //$status = ['status'=>'interrupted', 'global_status' => 'interrupted'];
+        $status = ['global_status' => 'interrupted'];
+        $query = $this->db->update('contracts_negotiations',$status);
+        $this->db->where($data);
+        $this->db->where('status', 'inprocess');
+        $status = ['status' => 'interrupted'];
         $query = $this->db->update('contracts_negotiations',$status);
         $this->db->where('contract_number',$data['contract_number']);
         $journal_status = ['status'=>'draft'];
@@ -256,7 +281,17 @@ class Contracts_model extends CI_Model{
         }
     }
 
-
+// Договора для юриста
+    function jurist_new_contracts (){
+        $this->db->where('letter_type', 'N/A');
+        $query = $this->db->get('contracts_journal');
+        return $query -> result_array();
+    }
+    function jurist_contracts ($data){
+        $this->db->where('jurist', $data);
+        $query = $this->db->get('contracts_journal');
+        return $query -> result_array();
+    }
 }
 
 

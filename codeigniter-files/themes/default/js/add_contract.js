@@ -26,7 +26,6 @@ $(document).ready(function(){
     $('#validity-date').datepicker()
     letters = ''
     $('#contractor').keypress(function(event){
-        console.log(String.fromCharCode(event.which));
         if (event.which == "8"){
             letters = letters.substring(0, letters.length - 1)
             $('#dropdown-contractor').hide().removeAttr('style');
@@ -68,11 +67,20 @@ $(document).ready(function(){
         e.preventDefault();
         var method = $(this).attr('method');
         var action = $(this).attr('action');
+        //cn = $(':input[name="contract_number"]').val();
+        //id = $(':input[name="incoming_date"]').val();
+        //id = $(':input[name="incoming_date"]').val();
         var content = $(this).serialize();
+        var fdata = new FormData();
+        fdata.append ('userfile', $('#userfile')[0].files[0])
+        fdata.append ('file_type', '0');
+        fdata.append ('text', content);
         $.ajax({
             type: method,
             url: action,
-            data: content,
+            processData: false,
+            contentType: false,
+            data: fdata,
             success: function(result){
                 var res = $.parseJSON(result);
                 $('.modal-body').empty();

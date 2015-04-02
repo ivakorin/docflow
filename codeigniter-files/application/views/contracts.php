@@ -7,8 +7,11 @@
                                 <small><? echo $main;?></small>
                             </h1>
                         </div>
-                        <button class="btn btn-primary" data-toggle="modal" data-target="#addContract"><? echo $add_contract;?></button>
-                        <a class="btn btn-default" href="/index.php/Contracts/add_contractor"><? echo $add_contractor; ?></a>
+                        <?
+                        if ($jurist == '1'){
+                            echo '<a class="btn btn-default" href="/index.php/Contracts/add_contractor">'.$add_contractor.'</a>';
+                        }
+                        ?>
                     </div>
                 </div>
                 <div class="row">
@@ -82,6 +85,10 @@
                                     }
                                     else if ($row['status'] == 'disagree'){
                                         echo '<td><span class="label label-danger" title="Не согласован">Не согласован</span></td>';
+
+                                    }
+                                    else if ($row['status'] == 'signed'){
+                                        echo '<td><span class="label label-primary" title="Договор подписан">Подписан</span></td>';
 
                                     }
                                     else {

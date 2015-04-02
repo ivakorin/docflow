@@ -80,7 +80,7 @@
 
                         }
                      }
-                    if ($uemail === $email){
+                    if ($jt == '1'){
                         if ($global_status == 'inprocess'){
                             echo '<p><button class="btn btn-danger" id="break" type="button">Прервать согласование</button></p>';
                         }

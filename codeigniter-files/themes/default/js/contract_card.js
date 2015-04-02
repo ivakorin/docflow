@@ -20,7 +20,7 @@
  *
  *
  */
-$( document ).ready(function() {
+$(document).ready(function() {
     $(document).on('click', '#show-add-form', function(){
         $('#show-add-div').hide();
         $('#upload-form').show();
@@ -179,6 +179,53 @@ $( document ).ready(function() {
                 }
             });
         }
+    });
+    $('#letter_form').submit(function(e){
+        e.preventDefault();
+        var method = $(this).attr('method');
+        var action='/index.php/Contracts/add_letter'
+        var ldata=$(this).serialize();
+        var letter = $('#letter').val();
+        if (letter == 'none'){
+            alert ('Выберите литеру')
+        }
+        else {
+            console.log(letter);
+            $.ajax({
+                type: method,
+                url: action,
+                data: ldata,
+                success: function (result){
+                    var obj = $.parseJSON(result);
+                    if (obj.error){
+                        $('#letter_form').replaceWith('<p class="text-danger">'+obj.error+'</p>');
+                    }
+                    else {
+                        $('#letter_form').replaceWith('<p class="text-success">'+obj.success+'</p>');
+                        $('#add_letters_btn').remove();
+                        location.reload();
+                    }
+
+                }
+            });
+        }
+    });
+    $(document).on('click', '#signed-btn', function(e){
+        e.preventDefault();
+        var form_data = $('#signed-form').serialize();
+        var method = $('#signed-form').attr('method');
+        var action = $('#signed-form').attr('action');
+        $.ajax({
+            type: method,
+            url: action,
+            data: form_data,
+            success: function(result){
+                location.reload();
+            },
+            error: function(error){
+                alert('Что-то пошло не так, свяжитесь с администратором');
+            }
+        })
     });
 })
 

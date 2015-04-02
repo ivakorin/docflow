@@ -25,6 +25,22 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Contracts extends CI_Controller {
 
+    private function jurist_email (){
+        $result = $this->contracts_model->find_jurist();
+        foreach ($result as $value){
+            $result = $value['email'];
+        }
+        return $result;
+    }
+
+    private function jurist ($data){
+        $result = $this->contracts_model->jurist($data);
+            foreach ($result as $value){
+                $result = $value['jurist'];
+            }
+        return $result;
+    }
+
     private function user($data){
         $this->load->model('contracts_model');
         $email = $data;
@@ -47,35 +63,36 @@ class Contracts extends CI_Controller {
 //Загружаем модель договоров для создания запросов к БД
             $this->load->model('contracts_model');
 // Получаем сведения о кураторе договора, данные берутся из ссессии активного пользователя
-            $title['curator'] = $this->session->userdata('email');
+            //$title['curator'] = $this->session->userdata('email');
             $title['user'] = $this->user($this->session->userdata('email'));
-//Разделитель для договора
-            $separator = '-';
-// Дата договора для регистрации в журнале договоров
-            $title['date'] = date('d.m.Y');
+////Разделитель для договора
+            //$separator = '-';
+//// Дата договора для регистрации в журнале договоров
+            //$title['date'] = date('d.m.Y');
 //Задаём переменные для отображения в виде (view)
+            $title['jurist'] = $this->jurist($this->session->userdata('email'));
             $title['main'] = 'Контракты';
             $title['journal'] = 'Журнал договоров';
             $title['add_contractor'] = 'Добавить контрагента';
             $title['add_contract'] = 'Добавить договор';
             $title['contracts_list'] = 'Договоры';
-//Получаем список литер договора для создания карточки договора
-            $title['letters_list'] = $this->contracts_model->get_letters();
-//Получаем список видов договоров для создания карточки договора
-            $title['species'] = $this->contracts_model->get_species();
-// Создаём предворительный № договора, при отправке запроса на добавление договора номер может изменится, если был добавлен договор другим пользователем для создания карточки договора
-            $title['contract_number'] = 1+$this->contracts_model->get_contract_number().$separator.date('y');
-//Полуаем список валют для создания карточки договора
-            $title['valute_list'] = $this->contracts_model->get_valutes();
-// Получаем виды закупки для создания карточки договора
-            $title['purchase_types'] = $this->contracts_model->purchase_types();
-//Получаем методы закупки для создания карточки договора
-            $title['purchase_methods'] = $this->contracts_model->purchase_methods();
-// Получаем все договоры для создания журнала договоров
+////Получаем список литер договора для создания карточки договора
+            //$title['letters_list'] = $this->contracts_model->get_letters();
+////Получаем список видов договоров для создания карточки договора
+            //$title['species'] = $this->contracts_model->get_species();
+//// Создаём предворительный № договора, при отправке запроса на добавление договора номер может изменится, если был добавлен договор другим пользователем для создания карточки договора
+            //$title['contract_number'] = 1+$this->contracts_model->get_contract_number().$separator.date('y');
+////Полуаем список валют для создания карточки договора
+            //$title['valute_list'] = $this->contracts_model->get_valutes();
+//// Получаем виды закупки для создания карточки договора
+            //$title['purchase_types'] = $this->contracts_model->purchase_types();
+////Получаем методы закупки для создания карточки договора
+            //$title['purchase_methods'] = $this->contracts_model->purchase_methods();
+//// Получаем все договоры для создания журнала договоров
             $title['all_contracts'] = $this->contracts_model->get_all_contracts();
-//Загружаем библиотеку фреймворка, для работы с формами
+////Загружаем библиотеку фреймворка, для работы с формами
             $this->load->helper('form', 'url');
-// Загружаем виды (views)
+//// Загружаем виды (views)
             $this->load->view('head',$title);
             $this->load->view('contracts');
             $this->load->view('footer');
@@ -94,35 +111,108 @@ class Contracts extends CI_Controller {
         $this->load->model('contracts_model');
 //Загружаем сепаратор для создания разделителя в номере договоров
         $separator = '-';
+// Преобразуем в массив данные формы полученые через ajax
+        $contract_data = [];
+        parse_str($this->input->post('text'), $contract_data);
+
 //Получаем дату договора у контрагена, конвертируем в UNIX формат, для более удобной работы в дальнейшем
-        $incoming_contract_date = ['incoming_contract_date' => strtotime($this->input->post('incoming_contract_date'))];
+        $contract_data['incoming_contract_date'] = strtotime($contract_data['incoming_contract_date']);
 //Задаём дату контракта согласно времени создания карточки контракта
-        $incoming_date = ['incoming_date' => time()];
+        $contract_data['incoming_date'] = time();
 // Получаем срок действия контракта, конвертируем в UNIX формат
-        $validity = ['validity' => strtotime($this->input->post('validity'))];
+        $contract_data['validity'] = strtotime($contract_data['validity']);
         //Получаем актуальный номер контракта для внесения в базу, так как за время правки, кто-то мог уже добавить запись в базу данных, кроме того.
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Необходимо доделать сброс номера договора, если изменился год.
-        $contract_number = ['contract_number' => 1+$this->contracts_model->get_contract_number().$separator.date('y')];
+        $contract_data['contract_number'] = 1+$this->contracts_model->get_contract_number().$separator.date('y');
         // По умолчанию присваеваем всем договорам статус проект
-        $status = ['status' => 'draft'];
+        $contract_data['status'] = 'draft';
         // Меняем запятую на точку в десятичных у стоимости контракта, для внесения в базу данных
-        $contract_cost = ['contract_cost' => str_replace(',','.', $this->input->post('contract_cost'))];
-// Создаём массив для последующей передачи в модель и записи в таблицу
-        $contract_data = $this->input->post(array('curator','contract_species', 'contract_subject', 'contractor_name', 'incoming_contract_number', 'incoming_date', 'initiator', 'letter_type', 'purchase_method', 'contract_type', 'validity', 'valute'),true);
-// Объеденяем все массивы для записи в таблицу
-        $merged = array_merge ($contract_cost, $contract_number, $contract_data, $incoming_date, $incoming_contract_date, $validity, $status);
+        $contract_data['contract_cost'] = str_replace(',','.', $contract_data['contract_cost']);
 // Проверяем существует ли контрагент, если нет, возвращаем с ошибкой
         $result = $this->contracts_model->check_name($contract_data['contractor_name']);
         if ($result != '1'){
-            echo "Указан не существующий контрагент, введите корректное имя";
+            $json_array = ['error' => 'Указан не существующий контрагент, введите корректное имя'];
+            echo json_encode($json_array, JSON_UNESCAPED_UNICODE);
+            return;
         }
 // Если совпадений нет, записываем в БД и сообщаем пользователю номер контракта
         else{
-            $this->contracts_model->add_contract($merged);
-            $json_array =   ['result' => "Контракт c номером ".$contract_number['contract_number'].'/'.$contract_data['letter_type']." сохранён, не забудьте указать номер на договоре",
-                            'link' => $contract_number['contract_number']];
+            if (empty($contract_data['letter_type'])){
+                $contract_data['letter_type'] = 'N/A';
+            }
+            $this->contracts_model->add_contract($contract_data);
+            $json_array =  ['result' => "Контракт c номером ".$contract_data['contract_number'].'/'.$contract_data['letter_type']." сохранён, не забудьте указать номер на договоре", 'link' => $contract_data['contract_number']];
             echo json_encode($json_array, JSON_UNESCAPED_UNICODE);
         }
+// Сохраняем файл
+// Конфигурируем библиотеку file_upload
+// Путь хранения файлов
+        $config['upload_path'] = './upload/';
+//Разрешённые типы файлов
+        $config['allowed_types'] = 'doc|docx|pdf';
+// Максимально допустимый размер файла
+        $config['max_size'] = '4608';
+// Получаем тип файла, для записи в БД
+        $document_type = $this->input->post('file_type');
+// Получаем номер договора, для создания ключа в таблице с типами файлов
+        $contract_number = $contract_data['contract_number'];
+// 0 - Проект договора, все документы для этого типа переименовываются в Проект договора с "контролем версий"
+        $version = $this->contracts_model->get_file_rows($document_type, $contract_number);
+        if ($version == '0'){
+            $version = 1;
+            $insert['file_version'] = $version;
+            $config['file_name'] = 'Проект договора_№'.$contract_number.'_версия 1';
+        }
+        else{
+            //$version = $this->contracts_model->get_file_rows($document_type, $contract_number);
+            $version++;
+            $insert['file_version'] = $version;
+            $config['file_name'] = 'Проект договора_№'.$contract_number.'_версия_'.$version;
+        }
+// Загружаем библиотеку для загрузки файлов
+        $this->load->library('upload', $config);
+// Если с данными что-то не в порядке, генерируем информацию об ошибке используя стандартный набор информации от библиотеки
+        if ( ! $this->upload->do_upload()){
+            $error = array('error' => $this->upload->display_errors());
+            echo json_encode($error,JSON_UNESCAPED_UNICODE);
+        }
+// Если всё хорошо, то записываем данные в таблицу links_to_files
+        else{
+            $data = array('upload_data' => $this->upload->data());
+// Получаем имя файла у пользователя
+            $link_to_file = $config['upload_path'].$this->upload->data('file_name');
+// Удаляем точку перед директроией храниния файлов, для более удобного запроса ссылки в БД в дальнейшем
+            $insert['link_to_file'] =str_replace('./','/',$link_to_file);
+// Присваиваем номер контракта
+            $insert['contract_number'] = $contract_number;
+// Указываем тип документа
+            $insert['file_type'] = $document_type;
+// Указываем имя файла
+            $insert['file_name'] = $this->upload->data('file_name');
+// Выполняем запись информации в БД и сообщаем пользователю о результатах
+            $result = $this->contracts_model->add_link_to_file($insert);
+            //echo json_encode($data,JSON_UNESCAPED_UNICODE);
+        }
+// Посылаем уведомление Юристу, о том, что поступил новый договор
+        $user_email = $this->contracts_model->find_jurist();
+        foreach ($user_email as $value){
+            $user_email = $value['email'];
+        }
+        $this->load->helper('url');
+        $message = 'В базу был добавлен новый договор <br> Для согласования перейдите по ссылке:'
+                    .site_url('Contracts/contract_card/'.$contract_number);
+        $this->load->library('email');
+        $config['protocol'] = 'mail';
+        $config['charset'] = 'utf-8';
+        $config['wordwrap'] = TRUE;
+        $config['newline'] = '\r\n';
+        $config['mailtype'] = 'html';
+        $this->email->initialize($config);
+        $this->email->from('contracts@pskovavia.ru', 'Договора Псковавиа');
+        $this->email->subject('В базу был добавлен новый договор');
+        $this->email->message($message);
+        $this->email->to($user_email);
+        $this->email->send();
 
 
     }
@@ -212,6 +302,9 @@ class Contracts extends CI_Controller {
  ************************************************************************/
 // $number указывает на номер договора
     public function contract_card($number){
+        if (!isset($number)){
+                show_404();
+            }
 //Проверяем сессию пользователя
         $this->load->library('session');
         $check_auth = $this->session->userdata('logged_in');
@@ -223,6 +316,9 @@ class Contracts extends CI_Controller {
             $title['user'] = $this->user($this->session->userdata('email'));
 //Получаем всю информацию по номеру договора из таблицы contract_journal
             $data = $this->contracts_model->get_contract($number);
+            if ($data == NULL){
+                show_404();
+            }
 // Рпзбираем всю информацию через цикл
             foreach ($data as $value){
                 $value;
@@ -239,6 +335,9 @@ class Contracts extends CI_Controller {
                 $v_value;
             }
 // Загаловки страницы
+// Если пользователь является юристом, даём ему более широкие права доступа
+            $title['jt'] = $this->jurist($this->session->userdata('email'));
+            $title['letters_list'] = $this->contracts_model->get_letters();
             $title['main'] ='Контракты';
             $title['journal'] = 'Карточка договора';
             $title['user_email'] = $this->session->userdata('email');
@@ -258,23 +357,31 @@ class Contracts extends CI_Controller {
             $title['all_lists'] = array_values($all_lists);
 // Объеденяем массивы для передачи в вид
             $title = array_merge($title, $value, $v_value, $cur);
-
-// Если номера договора нет в базе, то возвращаем ошибку
-// !!!!!! НЕОБХОДИМО ДОРАБОТАТЬ И ВЫДАВАТЬ ПОЛЬЗОВАТЕЛЮ ОБЫЧНУЮ 404 страницу
-            if ($data == NULL){
-                echo "error";
-            }
-            else {
-                $this->load->view('head',$title);
-                $this->load->view('contract_card');
-                $this->load->view('footer');
-            }
+            $this->load->view('head',$title);
+            $this->load->view('contract_card');
+            $this->load->view('footer');
         }
         else{
             header('Location: /');
         }
     }
-//Добавление файлов к договору
+//ДОБАВЛЕНИЕ ЛИТЕРЫ К ДОГОВОРУ ЕСЛИ ОНА НЕ УСТАНОВЛЕНА
+    function add_letter(){
+        $this->load->model('contracts_model');
+        $data = ['letter_type' => $this->input->post('letter'), 'jurist' => $this->input->post('jurist') ];
+        $result = $this->contracts_model->add_letter($this->input->post('contract_number'), $data);
+        if ($result == '1'){
+            $success = ['success' => 'Литера успешно добавлена'];
+            echo json_encode ($success, JSON_UNESCAPED_UNICODE);
+        }
+        else {
+            $error = ['error' => 'Что-то пошло не так, свяжитесь с администратором'];
+            echo json_encode ($error, JSON_UNESCAPED_UNICODE);
+        }
+
+    }
+
+//ДОБАВЛЕНИЕ ФАЙЛОВ К ДОГОВОРУ
     function add_file(){
 // Загружаем модель для запросов к БД
         $this->load->model('contracts_model');
@@ -353,6 +460,36 @@ class Contracts extends CI_Controller {
         }
 
     }
+// Устанавливаем статус договора как подписаный
+    function contract_signed (){
+        $this->load->model('contracts_model');
+        $contract_number = $this->input->post('contract_number');
+        $data = ['status' => $this->input->post('status')];
+        $result = $this->contracts_model->update_contract_status($data,$contract_number);
+        if ($result == '1'){
+             $this->load->helper('url');
+            $message = 'Договор № '.$contract_number.' подписан.<br> Вы можете скачать подписанную копию договора перейдя по ссылке:'
+                        .site_url('Contracts/contract_card/'.$contract_number);
+            $this->load->library('email');
+            $config['protocol'] = 'mail';
+            $config['charset'] = 'utf-8';
+            $config['wordwrap'] = TRUE;
+            $config['newline'] = '\r\n';
+            $config['mailtype'] = 'html';
+            $this->email->initialize($config);
+            $this->email->from('contracts@pskovavia.ru', 'Договора Псковавиа');
+            $this->email->subject('Договор № '.$contract_number.' подписан');
+            $this->email->message($message);
+            $this->email->to($this->input->post('curator_email'));
+        $this->email->send();
+            $success = ['success' => 'Ok'];
+            echo json_encode ($success, JSON_UNESCAPED_UNICODE);
+        }
+        else {
+            $error = ['error' => 'error'];
+            echo json_encode ($error, JSON_UNESCAPED_UNICODE);
+        }
+    }
 /*************************************************************************
  *                      СОГЛАСОВАНИЕ ДОГОВОРА
  *
@@ -394,7 +531,7 @@ class Contracts extends CI_Controller {
         else {
 // Email создаём тело письма
             $this->load->helper('url');
-            $message = 'Начат процесс согласования Договора № '.$clean_data ['contract_number'].' \r\n Для согласования перейдите по ссылке: \r\n'
+            $message = 'Начат процесс согласования Договора № '.$clean_data ['contract_number'].'<br>Для согласования перейдите по ссылке: '
             .site_url('Contracts/member_agree/'.$clean_data ['contract_number'].'/'.$insert_data ['revision']);
 // Загружаем и конфигурируем модуль отправки электронной почты
             $this->load->library('email');
@@ -402,9 +539,10 @@ class Contracts extends CI_Controller {
             $config['charset'] = 'utf-8';
             $config['wordwrap'] = TRUE;
             $config['newline'] = '\r\n';
+            $config['mailtype'] = 'html';
             $this->email->initialize($config);
             $this->email->from('contracts@pskovavia.ru', 'Договора Псковавиа');
-            $this->email->subject('Начат процесс согласования договора'.$clean_data ['contract_number']);
+            $this->email->subject('Начат процесс согласования договора №'.$clean_data ['contract_number']);
             $this->email->message($message);
             for ($i = 0; $i<$data_count;){
                 $insert_data ['file_name'] = $clean_data['file_name'];
@@ -412,6 +550,7 @@ class Contracts extends CI_Controller {
                 $insert_data ['status'] = 'inprocess';
                 $insert_data ['contract_number'] = $clean_data['contract_number'];
                 $insert_data ['global_status'] = 'inprocess';
+                $insert_data ['begin_time_stamp'] = time();
                 $this->contracts_model->input_negotiation_data($insert_data);
 // Информируем о начале согласования по почте
                 $user_email = $this->contracts_model->get_email($clean_data['member-'.$i]);
@@ -492,6 +631,7 @@ class Contracts extends CI_Controller {
             $title['user'] = $this->user($this->session->userdata('email'));
             $title['journal']= 'Лист согласования № ';
             $title['main']='Контракты';
+            $title['jt'] = $this->jurist($this->session->userdata('email'));
             $title ['number']=$number;
             $title ['letter']=$letter;
             $data = array_merge($title, $cur, $value,$v_value, $lf);
@@ -613,6 +753,24 @@ class Contracts extends CI_Controller {
         $data = $this->input->post();
         $where = ['contract_number' => $data['contract_number'], 'revision'=> $data['revision'], 'member'=>$data['member']];
         $update = ['voted' => $data['voted'], 'note'=>$data['note'], 'status' => $data['status']];
+        if ($data['status'] == 'disagree'){
+            $user_email = $this->jurist_email();
+            $this->load->helper('url');
+            $message = 'Получена отрицательная виза <br> Для просмотра перейдите по ссылке:'
+                        .site_url('Contracts/agree_list/'.$data['contract_number'].'/'.$data['revision']).'<br>Замечания: '.$data['note'].'<br> От участника: '.$data['member'];
+            $this->load->library('email');
+            $config['protocol'] = 'mail';
+            $config['charset'] = 'utf-8';
+            $config['wordwrap'] = TRUE;
+            $config['newline'] = '\r\n';
+            $config['mailtype'] = 'html';
+            $this->email->initialize($config);
+            $this->email->from('contracts@pskovavia.ru', 'Договора Псковавиа');
+            $this->email->subject('Договор №'.$data['contract_number'].' получена отрицательная виза');
+            $this->email->message($message);
+            $this->email->to($user_email);
+            $this->email->send();
+        }
         $upd = $this->contracts_model->update_negotiation($where, $update);
         $where = ['contract_number' => $data['contract_number'], 'revision'=> $data['revision']];
         $count_total = $this->contracts_model->count_agree_total($where);
@@ -630,13 +788,45 @@ class Contracts extends CI_Controller {
                 $where = ['contract_number' => $data['contract_number'], 'revision'=> $data['revision']];
                 $update = ['global_status' => 'agreed'];
                 $nupdate = $this->contracts_model->upd_global_status($where, $update);
-            }
+                $user_email = $this->jurist_email();
+                $this->load->helper('url');
+                $message = 'Договор согласован <br> Открыть карточку договора:'
+                            .site_url('Contracts/contract_card/'.$data['contract_number']);
+                $this->load->library('email');
+                $config['protocol'] = 'mail';
+                $config['charset'] = 'utf-8';
+                $config['wordwrap'] = TRUE;
+                $config['newline'] = '\r\n';
+                $config['mailtype'] = 'html';
+                $this->email->initialize($config);
+                $this->email->from('contracts@pskovavia.ru', 'Договора Псковавиа');
+                $this->email->subject('Договор №'.$data['contract_number'].' согласован');
+                $this->email->message($message);
+                $this->email->to($user_email);
+                $this->email->send();
+                }
             else {
                 $status = ['status' => 'disagree'];
                 $this->contracts_model->update_contract_status($status, $data['contract_number']);
                 $where = ['contract_number' => $data['contract_number'], 'revision'=> $data['revision']];
                 $update = ['global_status' => 'disagree'];
                 $jupdate = $this->contracts_model->upd_global_status($where, $update);
+                $user_email = $this->jurist_email();
+                $this->load->helper('url');
+                $message = 'Договор не согласован <br> Открыть карточку договора:'
+                            .site_url('Contracts/contract_card/'.$data['contract_number']);
+                $this->load->library('email');
+                $config['protocol'] = 'mail';
+                $config['charset'] = 'utf-8';
+                $config['wordwrap'] = TRUE;
+                $config['newline'] = '\r\n';
+                $config['mailtype'] = 'html';
+                $this->email->initialize($config);
+                $this->email->from('contracts@pskovavia.ru', 'Договора Псковавиа');
+                $this->email->subject('Договор №'.$data['contract_number'].' не согласован');
+                $this->email->message($message);
+                $this->email->to($user_email);
+                $this->email->send();
             }
         }
     }
