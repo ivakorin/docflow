@@ -203,7 +203,6 @@ $(document).ready(function() {
                     else {
                         $('#letter_form').replaceWith('<p class="text-success">'+obj.success+'</p>');
                         $('#add_letters_btn').remove();
-                        location.reload();
                     }
 
                 }

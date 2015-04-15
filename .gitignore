@@ -1,1 +1,4 @@
 /User_guide.odt
+/codeigniter-files/upload/*
+/codeigniter-files/application/config/database.php
+/.gitignore

@@ -114,7 +114,6 @@ class Contracts extends CI_Controller {
 // Преобразуем в массив данные формы полученые через ajax
         $contract_data = [];
         parse_str($this->input->post('text'), $contract_data);
-
 //Получаем дату договора у контрагена, конвертируем в UNIX формат, для более удобной работы в дальнейшем
         $contract_data['incoming_contract_date'] = strtotime($contract_data['incoming_contract_date']);
 //Задаём дату контракта согласно времени создания карточки контракта

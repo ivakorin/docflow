@@ -312,18 +312,6 @@
                                         <div class="col-md-4">
                                             <?echo form_input('incoming_date',$date,'type="text" class="form-control" disabled');?>
                                         </div>
-<!--
-                                        <div class="col-md-2">
-                                            <select class="form-control" name = "letter_type" title="Литера договора" required>
-                                                <option value=""> </option>
-                                                <?
-                                                    //foreach ($letters_list as $value){
-                                                        //echo '<option value='.$value['letter'].'>'.$value['letter'].'</option>';
-                                                    //}
-                                                ?>
-                                            </select>
-                                        </div>
--->
                                         <div class="col-md-4">
                                             <select class="form-control" name = "contract_species" title="Вид договора" required>
                                                 <option value=""></option>

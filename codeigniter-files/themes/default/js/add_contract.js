@@ -22,6 +22,14 @@
  */
 
 $(document).ready(function(){
+    //function generateBoundary(){
+            //var chars = '0123456789',
+            //out   = '';
+            //for( var i = 0, len = chars.length; i < 30; i++) {
+               //out += chars[Math.floor(Math.random()*len)];
+            //}
+            //return '----' + out;
+        //}
     $('#contractor-date').datepicker()
     $('#validity-date').datepicker()
     letters = ''
@@ -67,9 +75,6 @@ $(document).ready(function(){
         e.preventDefault();
         var method = $(this).attr('method');
         var action = $(this).attr('action');
-        //cn = $(':input[name="contract_number"]').val();
-        //id = $(':input[name="incoming_date"]').val();
-        //id = $(':input[name="incoming_date"]').val();
         var content = $(this).serialize();
         var fdata = new FormData();
         fdata.append ('userfile', $('#userfile')[0].files[0])
@@ -78,9 +83,9 @@ $(document).ready(function(){
         $.ajax({
             type: method,
             url: action,
+            data: fdata,
             processData: false,
             contentType: false,
-            data: fdata,
             success: function(result){
                 var res = $.parseJSON(result);
                 $('.modal-body').empty();
