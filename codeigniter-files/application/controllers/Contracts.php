@@ -858,6 +858,36 @@ class Contracts extends CI_Controller {
             header('Location: /');
         }
     }
+// КАРТОЧКА КОНТРАГЕНТА
+    function contractor_card ($id){
+// Стандартно проверяем авторизован ли пользователь
+        $this->load->library('session');
+        $check_auth = $this->session->userdata('logged_in');
+        if ($check_auth == TRUE){
+// Загружаем модель для работы с базой данных
+            $this->load->model('contracts_model');
+// Получаем данные о договоре
+            $cd = $this->contracts_model->get_contractor_info($id);
+            foreach ($cd as $contractor_data){
+                $contractor_data;
+            }
+// Передаём данные для отражения в view
+            $title['all_contracts'] = $this->contracts_model->get_contractor_contracts($contractor_data['name']); // Получаем список всех договоров контрагента и передаем во view
+            $title['contractor_data'] = $contractor_data;
+            $title['jurist'] = $this->jurist($this->session->userdata('email'));
+            $title['main'] = 'Контракты';
+            $title['journal'] = 'Карточка контрагента';
+            $title['contracts_list'] = 'Контрагенты';
+            $title['user'] = $this->user($this->session->userdata('email'));
+//Загружаем view
+            $this->load->view('head',$title);
+            $this->load->view('contractor_card');
+            $this->load->view('footer');
+        }
+        else{
+            header('Location: /');
+        }
+    }
 
 
 }

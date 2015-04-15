@@ -300,6 +300,19 @@ class Contracts_model extends CI_Model{
         $query = $this->db->get('contractors');
         return $query -> result_array();
     }
+// Получаем все данные о контрагенте для формирования карточки
+    function get_contractor_info($data){
+        $this->db->where('id', $data);
+        $query = $this->db->get('contractors');
+        return $query -> result_array();
+
+    }
+// Получаем все договора пользователя
+    function get_contractor_contracts($data){
+        $this->db->where('contractor_name', $data);
+        $query = $this->db->get('contracts_journal');
+        return $query -> result_array();
+    }
 }
 
 
