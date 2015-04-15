@@ -114,6 +114,7 @@ class Contracts extends CI_Controller {
 // Преобразуем в массив данные формы полученые через ajax
         $contract_data = [];
         parse_str($this->input->post('text'), $contract_data);
+
 //Получаем дату договора у контрагена, конвертируем в UNIX формат, для более удобной работы в дальнейшем
         $contract_data['incoming_contract_date'] = strtotime($contract_data['incoming_contract_date']);
 //Задаём дату контракта согласно времени создания карточки контракта
@@ -827,6 +828,34 @@ class Contracts extends CI_Controller {
                 $this->email->to($user_email);
                 $this->email->send();
             }
+        }
+    }
+/*************************************************************************
+ *                     КОНТРАГЕНТЫ
+ *
+ ************************************************************************/
+    function contractors_list(){
+        $this->load->library('session');
+        $check_auth = $this->session->userdata('logged_in');
+        if ($check_auth == TRUE){
+//Загружаем модель договоров для создания запросов к БД
+            $this->load->model('contracts_model');
+//Задаём переменные для отображения в виде (view)
+            $title['jurist'] = $this->jurist($this->session->userdata('email'));
+            $title['main'] = 'Контракты';
+            $title['journal'] = 'Журнал контрагентов';
+            $title['add_contractor'] = 'Добавить контрагента';
+            $title['contracts_list'] = 'Контрагенты';
+            $title['user'] = $this->user($this->session->userdata('email'));
+// Получаем все договоры для создания журнала договоров
+            $title['all_contractors'] = $this->contracts_model->get_all_contractors();
+// Загружаем виды (views)
+            $this->load->view('head',$title);
+            $this->load->view('contractors');
+            $this->load->view('footer');
+        }
+        else{
+            header('Location: /');
         }
     }
 

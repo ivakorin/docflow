@@ -12,6 +12,11 @@
             <div class="row">
                 <div class="col-md-6">
                     <button class="btn btn-primary" data-toggle="modal" data-target="#addContract"><? echo $add_contract;?></button>
+                    <?
+                        if ($jurist == '1'){
+                            echo '<a class="btn btn-default" href="/index.php/Contracts/add_contractor">Добавить контрагента</a>';
+                        }
+                        ?>
                 </div>
                 <div class="col-md-6">
                 <? if ($jurist == '1'){
@@ -312,6 +317,18 @@
                                         <div class="col-md-4">
                                             <?echo form_input('incoming_date',$date,'type="text" class="form-control" disabled');?>
                                         </div>
+<!--
+                                        <div class="col-md-2">
+                                            <select class="form-control" name = "letter_type" title="Литера договора" required>
+                                                <option value=""> </option>
+                                                <?
+                                                    //foreach ($letters_list as $value){
+                                                        //echo '<option value='.$value['letter'].'>'.$value['letter'].'</option>';
+                                                    //}
+                                                ?>
+                                            </select>
+                                        </div>
+-->
                                         <div class="col-md-4">
                                             <select class="form-control" name = "contract_species" title="Вид договора" required>
                                                 <option value=""></option>

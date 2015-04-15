@@ -292,6 +292,14 @@ class Contracts_model extends CI_Model{
         $query = $this->db->get('contracts_journal');
         return $query -> result_array();
     }
+/*************************************************************************
+ *                      КОНТРАГЕНТЫ
+ *
+ ************************************************************************/
+    function get_all_contractors(){
+        $query = $this->db->get('contractors');
+        return $query -> result_array();
+    }
 }
 
 

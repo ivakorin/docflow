@@ -19,12 +19,12 @@
                             <li class="disabled"><a href="#">Главная</a></li>
                             <li class="disabled"><a href="#">Заявки</a></li>
                             <li class="active"><a href="/index.php/Contracts">Контракты</a></li>
+                            <li class=""><a href="/index.php/Contracts/contractors_list">Контрагенты</a></li>
                             <li class="disabled"><a href="#">Счета</a></li>
                             <li class=""><a href="/index.php/Contents/help">Помощь</a></li>
                             <?
                             if (!empty($user)){
                                 echo '<li class=""><a href="/index.php/Users/cabinet">Личный кабинет</a></li>';
-                                //echo '<p class="navbar-text navbar-right"><a href="/index.php/Users/cabinet" class="navbar-link">'.$user.'</a></p>';
                             }
                             ?>
                         </ul>
