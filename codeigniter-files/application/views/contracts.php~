@@ -1,5 +1,0 @@
-	<div id="content">
-	   <p class="header">Заявки</p>
-		<div class="main_filed">
-		<p><a href="/Contracts/add_contractor">Добавить контрагента</a></p>
-		</div>
