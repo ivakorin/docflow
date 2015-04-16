@@ -1,5 +1,4 @@
         <content>
-            <?print_r($all_contracts)?>
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12">
@@ -125,6 +124,9 @@
                                                 echo '</tr>';
                                                 $i++;
                                             }
+                                            else {
+                                                $i++;
+                                            }
                                         }
 
                                     echo '</table>';
@@ -149,6 +151,7 @@
                                     <?
                                     if (!empty ($all_contracts)){
                                         $all_contracts_count = count($all_contracts);
+                                        $current_time = time();
                                         echo '<table class="table table-responsive table-font">
                                                 <tr>
                                                     <th>#</th>
@@ -159,7 +162,7 @@
                                                 </tr>';
                                         for ($i=0; $i<$all_contracts_count;){
                                             $number = $i+1;
-                                            if (time() < $all_contracts[$i]['validity']){
+                                            if (time() > $all_contracts[$i]['validity']){
                                                 echo '<tr>';
                                                 echo '<td>'.$number.'</td>';
                                                 echo '<td>'.$all_contracts[$i]['contract_number'].'/'.$all_contracts[$i]['letter_type'].'</td>';
@@ -183,6 +186,9 @@
                                                     echo '<td><a href="/index.php/Contracts/contract_card/'.$all_contracts[$i]['contract_number'].'"><span class="label label-info" title="Проект">Проект</span></a></td>';
                                                 }
                                                 echo '</tr>';
+                                                $i++;
+                                            }
+                                            else {
                                                 $i++;
                                             }
                                         }
