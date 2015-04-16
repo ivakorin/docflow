@@ -866,6 +866,8 @@ class Contracts extends CI_Controller {
         if ($check_auth == TRUE){
 // Загружаем модель для работы с базой данных
             $this->load->model('contracts_model');
+// Загружаем библиотеку для работы с формами
+            $this->load->helper('form', 'url');
 // Получаем данные о договоре
             $cd = $this->contracts_model->get_contractor_info($id);
             foreach ($cd as $contractor_data){
@@ -887,6 +889,19 @@ class Contracts extends CI_Controller {
         else{
             header('Location: /');
         }
+    }
+// Обновляем данные по контрагенту в базе данных
+    function change_contractor(){
+        $this->load->model('contracts_model');
+        $result = $this->contracts_model->update_contractor($this->input->post());
+        if ($result == '1'){
+            $data = "Данные успешно обновлены";
+        }
+        else {
+            $data = "Произошла ошибка при обновлении данных";
+        }
+        $success = ['result' => $data];
+        echo json_encode ($success, JSON_UNESCAPED_UNICODE);
     }
 
 

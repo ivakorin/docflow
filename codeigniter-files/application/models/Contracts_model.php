@@ -313,6 +313,11 @@ class Contracts_model extends CI_Model{
         $query = $this->db->get('contracts_journal');
         return $query -> result_array();
     }
+// Обновляем данные о контрагенте
+    function update_contractor($data){
+        $query = $this->db->update('contractors', $data);
+        return $query;
+    }
 }
 
 

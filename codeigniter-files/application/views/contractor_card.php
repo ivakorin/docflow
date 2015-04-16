@@ -28,7 +28,7 @@
                     <div class="col-md-12">
                         <?
                         if ($jurist == '1'){
-                            echo '<button class="btn btn-primary">Изменить данные</button> ';
+                            echo '<button class="btn btn-primary" data-toggle="modal" data-target="#change_contractor">Изменить данные</button> ';
                             echo '<button class="btn btn-danger">Удалить контрагента</button>';
                         }
                         ?>
@@ -92,7 +92,7 @@
                                                 <tr>
                                                     <th>#</th>
                                                     <th>Номер</th>
-                                                    <th>Контрагент</th>
+                                                    <th>Инициатор</th>
                                                     <th>Предмет договора</th>
                                                     <th>Статус</th>
                                                 </tr>';
@@ -102,7 +102,7 @@
                                                 echo '<tr>';
                                                 echo '<td>'.$number.'</td>';
                                                 echo '<td>'.$all_contracts[$i]['contract_number'].'/'.$all_contracts[$i]['letter_type'].'</td>';
-                                                echo '<td>'.$all_contracts[$i]['contractor_name'].'</td>';
+                                                echo '<td>'.$all_contracts[$i]['initiator'].'</td>';
                                                 echo '<td>'.$all_contracts[$i]['contract_subject'].'</td>';
                                                 if($all_contracts[$i]['status'] == 'agreed'){
                                                     echo '<td><a href="/index.php/Contracts/contract_card/'.$all_contracts[$i]['contract_number'].'"><span class="label label-success" title="Согласован">Согласован</span></a></td>';
@@ -156,7 +156,7 @@
                                                 <tr>
                                                     <th>#</th>
                                                     <th>Номер</th>
-                                                    <th>Контрагент</th>
+                                                    <th>Инициатор</th>
                                                     <th>Предмет договора</th>
                                                     <th>Статус</th>
                                                 </tr>';
@@ -166,7 +166,7 @@
                                                 echo '<tr>';
                                                 echo '<td>'.$number.'</td>';
                                                 echo '<td>'.$all_contracts[$i]['contract_number'].'/'.$all_contracts[$i]['letter_type'].'</td>';
-                                                echo '<td>'.$all_contracts[$i]['contractor_name'].'</td>';
+                                                echo '<td>'.$all_contracts[$i]['initiator'].'</td>';
                                                 echo '<td>'.$all_contracts[$i]['contract_subject'].'</td>';
                                                 if($all_contracts[$i]['status'] == 'agreed'){
                                                     echo '<td><a href="/index.php/Contracts/contract_card/'.$all_contracts[$i]['contract_number'].'"><span class="label label-success" title="Согласован">Согласован</span></a></td>';
@@ -205,5 +205,103 @@
                     </div>
                 </div>
             </div>
+<!-- Модальное окно изменения контрагента!-->
+<div class="modal fade" id="change_contractor" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Изменить данные</h4>
+            </div>
+            <div class="modal-body">
+                <?  echo form_open('/Contracts/change_contractor','id="contractor_form"');?>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <?  echo form_input('name',$contractor_data['name'],'type="text" class="form-control" placeholder="'.$contractor_data['name'].'" required');?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <?  echo form_input('post_code',$contractor_data['post_code'],'type="text" class="form-control" maxlength="6" placeholder="'.$contractor_data['post_code'].'" required');?>
+                            </div>
+                            <div class="col-md-9">
+                                <?echo form_input('area',$contractor_data['area'],'type="text" class="form-control" placeholder="'.$contractor_data['area'].'"');?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <?  echo form_input('region',$contractor_data['region'],'type="text" class="form-control" id="focusedInput" placeholder="'.$contractor_data['region'].'"');?>
+                            </div>
+                            <div class="col-md-4">
+                                <?  echo form_input('city',$contractor_data['city'],'type="text" class="form-control" id="focusedInput" placeholder="'.$contractor_data['city'].'" required');?>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-10">
+                                <?  echo form_input('street',$contractor_data['street'],'type="text" class="form-control" placeholder="'.$contractor_data['street'].'" required');?>
+                            </div>
+                            <div class="col-md-2">
+                            <?  echo form_input('building',$contractor_data['building'],'type="text" class="form-control" placeholder="'.$contractor_data['building'].'" required');
+                            ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <?  echo form_input('web_site',$contractor_data['web_site'],'type="text" class="form-control" placeholder="'.$contractor_data['web_site'].'" required');?>
+                            </div>
+                            <div class="col-md-6">
+                                <?  echo form_input('phone',$contractor_data['phone'],'type="text" class="form-control" placeholder="'.$contractor_data['phone'].'" required');?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <p class="text-center text-info">Контактное лицо</p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <?  echo form_input('contact_person_name',$contractor_data['contact_person_name'],'type="text" class="form-control" placeholder="'.$contractor_data['contact_person_name'].'" required');?>
+                            </div>
+                            <div class="col-md-6">
+                                <?    echo form_input('contact_person_patronymic',$contractor_data['contact_person_patronymic'],'type="text" class="form-control" placeholder="'.$contractor_data['contact_person_patronymic'].'" required');
+                            ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <?  echo form_input('contact_person_surname',$contractor_data['contact_person_surname'],'type="text" class="form-control" placeholder="'.$contractor_data['contact_person_surname'].'" required');?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input name="email" type="email" class="form-control" required placeholder="<?echo $contractor_data['email']?>" value="<?echo $contractor_data['email']?>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <?  echo form_input('contact_person_phone',$contractor_data['contact_person_phone'],'type="text" class="form-control" placeholder="'.$contractor_data['contact_person_phone'].'" required');?>
+                            </div>
+                        </div>
+                    </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal" type="button">Закрыть</button>
+                <button id="change_contractor_btn" class="btn btn-primary" type="submit">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Конец модального окна!-->
         </content>
-<script src="/themes/default/js/contract_card.js"></script>
+<script src="/themes/default/js/contractor_card.js"></script>
