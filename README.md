@@ -8,7 +8,7 @@ Now this portal not have admin panel, maybe it will added to next realises, but 
  - set 777 permissions for "upload" catalog;
  - Create new  MySQL  DB named "contracts"
  - Import to your DB "contracts.sql"
- - Open database.php in config directory and change:
+ - Rename database.php-dist to database.hph in config directory then change file:
 
 ````php
 'hostname' => 'your DB hostname',
